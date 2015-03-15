@@ -13,7 +13,8 @@ Installation instructions (Windows 7)
 
 This script requires Python v3 and the pyOpenSSL library.   It has been developed and tested using Python v3.4.3, on Windows 7 SP1, 64bit.
 
-Download & install Python3 from https://www.python.org/downloads  (Default install 'for all users', install in the default installation folder).
+Download & install Python3 from https://www.python.org/downloads  
+(Perform a default install 'for all users', install in the default installation folder.
 
 Next, open an administrator command prompt and run the following commands to install pyOpenSSL:
 
@@ -68,10 +69,12 @@ The script takes 2 input files, which are expected to be placed in the current f
 (You can specify an alternate location using parameters -c and -s)
 
 `certmon.conf`
-This is where you can specify the hostnames & ports to connect to
+
+This is where you can specify the hostnames & ports to connect to.
 
 `certmon_smtp.conf` 
-This file contains information about your SMTP server, and the email addresses to use
+
+This file contains information about your SMTP server, and the email addresses to use.
 
 You can tweak the warning threshold with parameter -w.
 
