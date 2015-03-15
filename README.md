@@ -13,10 +13,10 @@ Installation instructions (Windows 7)
 
 This script requires Python v3 and the pyOpenSSL library.   It has been developed and tested using Python v3.4.3, on Windows 7 SP1, 64bit.
 
-Download & install Python3 from https://www.python.org/downloads  
-(Perform a default install 'for all users', install in the default installation folder.
+Download Python3 from https://www.python.org/downloads and launch the installation package with Administrator privileges.
+Perform a default install 'for all users', install in the default installation folder.
 
-Next, open an administrator command prompt and run the following commands to install pyOpenSSL:
+Next, open an Administrator command prompt and run the following commands to install pyOpenSSL:
 
 ```
 c:
