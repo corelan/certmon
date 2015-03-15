@@ -22,6 +22,8 @@ cd\python34
 cd scripts
 pip install pyOpenSSL
 ```
+(Make sure the machine has direct access to the internet.)
+
 
 
 Syntax
@@ -82,6 +84,8 @@ certmon_smtp.conf syntax
 ------------------------
 
 This is easy.  If the script is unable to find the smtp configuration file, it will ask you a couple of questions & create the file for you.
+If you want to check if the mail configuration works correctly simply run the script with option -mail.
+You should get a test email in your mailbox.
 
 
 
