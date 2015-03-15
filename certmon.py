@@ -126,7 +126,9 @@ def checkcerts(certconfigfile,mailconfigfile,alertbefore,showverbose):
 				thisitemparts = checkitem.split("=")
 				if len(thisitemparts) > 1:
 					fieldname = thisitemparts[0].lower().replace(" ","")
-					fieldkeyword = thisitemparts[1].lower().replace("\n","").replace("\r","")
+					remainingparts = thisitemparts[1:]
+					fieldkeyword = "=".join(x for x in remainingparts)
+					fieldkeyword = fieldkeyword.lower().replace("\n","").replace("\r","")
 					if not fieldname in fieldcheck:
 						fieldcheck[fieldname] = fieldkeyword
 
