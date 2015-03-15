@@ -16,18 +16,18 @@ This script requires Python v3 and the pyOpenSSL library.   It has been develope
 Download & install Python3 from https://www.python.org/downloads  (Default install 'for all users', install in the default installation folder)
 Next, open an administrator command prompt and run the following commands to install pyOpenSSL:
 
-`
+```
 c:
 cd\python34
 cd scripts
 pip install pyOpenSSL
-`
+```
 
 
 Syntax
 ------
 
-`
+```
 C:\>c:\python34\python.exe certmon.py -h
 
                      __
@@ -55,7 +55,7 @@ _/ ___\/ __ \_  __ \   __\/     \ /  _ \ /    \
      -w <nr>              : Warn of upcoming expiration x number of days in advance (default: 30)
 
      -mail                : Test e-mail configuration
-`
+```
 
 
 Usage
@@ -72,9 +72,9 @@ certmon.conf syntax
 
 This file contains the hostnames and portnumbers (default 443) to connect to.
 Syntax:
-`
+```
 hostname:port
-`
+```
 (only specify one hostname:port combination per line)
 
 
