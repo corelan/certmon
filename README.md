@@ -31,13 +31,13 @@ pip install pyOpenSSL
 ```
 (Make sure the machine has direct access to the internet.)
 
-
+Finally, download certmon.py and put it in a folder somewhere (e.g. c:\certmon)
 
 Syntax
 ------
 
 ```
-C:\>c:\python34\python.exe certmon.py -h
+C:\certmon>c:\python34\python.exe certmon.py -h
 
                      __
   ____  ____________/  |_  _____   ____   ____
