@@ -29,7 +29,39 @@ cd\python34
 cd scripts
 pip install pyOpenSSL
 ```
-(Make sure the machine has direct access to the internet.)
+(Make sure the machine has direct access to the internet before running the 'pip' command)
+
+If all goes well, you should see something like this:
+```
+Collecting pyOpenSSL
+  Downloading pyOpenSSL-0.14.tar.gz (128kB)
+    100% |################################| 131kB 1.4MB/s
+Collecting cryptography>=0.2.1 (from pyOpenSSL)
+  Downloading cryptography-0.8-cp34-none-win32.whl (960kB)
+    100% |################################| 962kB 391kB/s
+Collecting six>=1.5.2 (from pyOpenSSL)
+  Downloading six-1.9.0-py2.py3-none-any.whl
+Collecting pyasn1 (from cryptography>=0.2.1->pyOpenSSL)
+  Downloading pyasn1-0.1.7.tar.gz (68kB)
+    100% |################################| 69kB 723kB/s
+Requirement already satisfied (use --upgrade to upgrade): setuptools in c:\python34\lib\site-packages (from cryptography
+>=0.2.1->pyOpenSSL)
+Collecting cffi>=0.8 (from cryptography>=0.2.1->pyOpenSSL)
+  Downloading cffi-0.9.2-cp34-none-win32.whl (82kB)
+    100% |################################| 86kB 1.6MB/s
+Collecting pycparser (from cffi>=0.8->cryptography>=0.2.1->pyOpenSSL)
+  Downloading pycparser-2.10.tar.gz (206kB)
+    100% |################################| 208kB 975kB/s
+Installing collected packages: pycparser, cffi, pyasn1, six, cryptography, pyOpenSSL
+  Running setup.py install for pycparser
+
+  Running setup.py install for pyasn1
+
+
+  Running setup.py install for pyOpenSSL
+Successfully installed cffi-0.9.2 cryptography-0.8 pyOpenSSL-0.14 pyasn1-0.1.7 pycparser-2.10 six-1.9.0
+```
+
 
 Finally, download certmon.py and put it in a folder somewhere (e.g. c:\certmon)
 
