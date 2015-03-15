@@ -1,7 +1,10 @@
 certmon
 =======
 
-certmon.py is a simple certificate expiration monitor script.  It will connect to a given server on a given port, dump the certificate, and check if the certificate has expired or not. Additionally, it will also report if a certificate is about to expire in x nr of days.  (Default: 30 days)
+certmon.py is a simple certificate expiration monitor script.  It will connect to a given server on a given port, dump the certificate, and check if the certificate has expired or not. 
+
+Additionally, it will also report if a certificate is about to expire in x nr of days.  (Default: 30 days).
+
 On top of that, you can check the contents of certain fields in the certificate & see if it contains a keyword that should be there (to see if the certificate has been changed).
 
 Reports will be sent via email, allowing you to schedule the script to run on regular intervals.
@@ -107,6 +110,8 @@ Example:  Let's say I want to monitor the certificate on www.corelan.be, and I w
 ```
 www.corelan.be:443;issuer=StartCom;serial=1056083;subject=www.corelan.be
 ```
+
+(The fields must be ; separated, and the first field must contain the hostname and port).
 
 This configuration will trigger the following behaviour:
 
