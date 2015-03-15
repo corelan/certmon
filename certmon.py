@@ -26,6 +26,7 @@ import datetime
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+import traceback
 
 
 curdate = datetime.datetime.now()
@@ -46,7 +47,8 @@ def showSyntax(args):
 	print ("     -s <smtpconfigfile>  : full path to smtp config file.")
 	print ("                            Defaults to certmon_smtp.conf in current folder\n")
 	print ("     -w <nr>              : Warn of upcoming expiration x number of days in advance (default: 30)\n")
-	print ("     -mail                : Test e-mail configuration")
+	print ("     -mail                : Test e-mail configuration\n")
+	print ("     -v                   : Show verbose information about the certificates")
 	print ("")
 	return
 
@@ -101,20 +103,32 @@ def createMsg(x509,targethost,targetport,targetip, expirdate, diff):
 	return msg
 
 
-def checkcerts(certconfigfile,mailconfigfile,alertbefore):
+def checkcerts(certconfigfile,mailconfigfile,alertbefore,showverbose):
 	serverlist = getServerlist(certconfigfile)
 
 	warnlist = []
 	expirlist = []
+	changedlist = []
 
 	if len(serverlist) > 0:
 
 		print ("[+] Found %d entries in the cert config file at %s" % (len(serverlist),certconfigfile))
 
-		for targetitem in serverlist:
+		for targetrecord in serverlist:
 
-			targethost = targetitem[0]
-			targetport = targetitem[1]
+			targethost = targetrecord[0]
+			targetport = targetrecord[1]
+			checkdata = targetrecord[2]
+
+			fieldcheck = {}
+
+			for checkitem in checkdata:
+				thisitemparts = checkitem.split("=")
+				if len(thisitemparts) > 1:
+					fieldname = thisitemparts[0].lower().replace(" ","")
+					fieldkeyword = thisitemparts[1].lower().replace("\n","").replace("\r","")
+					if not fieldname in fieldcheck:
+						fieldcheck[fieldname] = fieldkeyword
 
 			targetips = [socket.gethostbyname(targethost)]
 
@@ -127,6 +141,17 @@ def checkcerts(certconfigfile,mailconfigfile,alertbefore):
 					x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, certinfo)
 					expirdatestr = str(x509.get_notAfter())
 					expirdate = datetime.datetime.strptime(expirdatestr.replace("b'","").replace("'",""),"%Y%m%d%H%M%SZ")
+
+					issuer = x509.get_issuer()
+					serial = x509.get_serial_number()
+					subject = x509.get_subject()
+					version = x509.get_version()
+
+					issuerok = True
+					serialok = True
+					subjectok = True
+					versionok = True
+					certchanged = False		
 					
 					delta = expirdate - curdate             
 					if delta.days < 0:
@@ -134,14 +159,63 @@ def checkcerts(certconfigfile,mailconfigfile,alertbefore):
 						thismsg = createMsg(x509,targethost,targetport,thisip,expirdate,delta.days)
 						expirlist.append(thismsg)
 					else:
-						print ("    Cert OK")
+						print ("    Cert expiration OK")
 						print ("    Note: Certificate will expire on %s (%d days from now)" % (expirdate,delta.days))
 						if delta.days < alertbefore:
 							print ("    ** Warning: certificate will expire in less than %d days" % alertbefore)
 							thismsg = createMsg(x509,targethost,targetport,thisip,expirdate,delta.days)
 							warnlist.append(thismsg)
+
+					if len(fieldcheck) > 0:
+						for fieldname in fieldcheck:
+							if fieldname == "issuer":
+								if not fieldcheck[fieldname] in str(issuer).lower():
+									issuerok = False
+									certchanged = True
+							elif fieldname == "subject":
+								if not fieldcheck[fieldname] in str(subject).lower():
+									subjectok = False
+									certchanged = True
+							elif fieldname == "version":
+								if not fieldcheck[fieldname] in str(version).lower():
+									versionok = False
+									certchanged = True
+							elif fieldname == "serial":
+								if not fieldcheck[fieldname] in str(serial).lower():
+									serialok = False
+									certchanged = True
+
+					if certchanged:
+						print ("    *** CERTIFICATE MAY HAVE BEEN CHANGED ***")
+						thismsg = createMsg(x509,targethost,targetport,thisip,expirdate,delta.days)
+						
+						if not subjectok:
+							print ("    Subject field contains '%s'" % subject)
+							print ("    Expected to contain: '%s'" % fieldcheck["subject"])
+							thismsg += "** Subject field does not contain '%s'\n" % fieldcheck["subject"]
+						if not issuerok:
+							print ("    Issuer field contains '%s'" % issuer)
+							print ("    Expected to contain: '%s'" % fieldcheck["issuer"])
+							thismsg += "** Issuer field does not contain '%s'\n" % fieldcheck["issuer"]
+						if not versionok:
+							print ("    Version field contains '%s'" % version)
+							print ("    Expected to contain: '%s'" % fieldcheck["version"])
+							thismsg += "** Version field does not contain '%s'\n" % fieldcheck["version"]
+						if not serialok:
+							print ("    Serial field contains '%s'" % serial)
+							print ("      Expected to contain: '%s'" % fieldcheck["serial"])
+							thismsg += "** Serial field does not contain '%s'\n" % fieldcheck["serial"]
+						changedlist.append(thismsg)
+
+					if showverbose:
+						print ("    Certificate information:")
+						print ("      subject: %s" % subject)
+						print ("      issuer: %s" % issuer)
+						print ("      version: %s" % version)
+						print ("      serial: %s" % serial)
 				except:
 					print ("    Unable to dump certificate from server")
+					print (traceback.format_exc())
 
 		footer = "\n\nThis report has been auto-generated with certmon.py - %s - %s\n " % (siteurl,getNow())
 		if len(expirlist) > 0:
@@ -173,7 +247,24 @@ def checkcerts(certconfigfile,mailconfigfile,alertbefore):
 
 			content = warnmsg.split("\n")
 			mailhandler = Mailer(mailconfigfile)
-			mailhandler.sendmail(content, mailsubject = "Upcoming Certificate Expiration Warning (certmon.py)")			
+			mailhandler.sendmail(content, mailsubject = "Upcoming Certificate Expiration Warning (certmon.py)")	
+
+
+		if len(changedlist) > 0:
+			print("\n[+] Sending email (Changed Certificates)")
+			changemsg = "Hi,\n\n"
+			changemsg += "The following certificates may have been changed:\n\n"
+			for l in changedlist:
+				changemsg += l
+				changemsg += "-" * 75
+				changemsg += "\n"
+			changemsg += "\n\n"
+			changemsg += footer
+
+			content = changemsg.split("\n")
+			mailhandler = Mailer(mailconfigfile)
+			mailhandler.sendmail(content, mailsubject = "Certificate Change Alert (certmon.py)")	
+
 	return
 
 
@@ -184,17 +275,29 @@ def getServerlist(certconfigfile):
 		content = f.readlines()
 		f.close()
 		for l in content:
-			lstripped = l.replace("\n","").replace("\r","").replace("\t","").replace(" ","")
+			checkdata = []
+			lstripped = l.replace("\n","").replace("\r","").replace("\t","")
 			if not lstripped.startswith("#") and len(l) > 0:
-				lineparts = lstripped.split(":")
+				lineparts = lstripped.split(";")
+
+				targetparts = lineparts[0].split(":")
+
 				rport = 443
-				rhost = lineparts[0]
-				if len(lineparts) > 1:
+				rhost = targetparts[0]
+				if len(targetparts) > 1:
 					try:
-						rport = int(rport)
+						rport = int(targetparts[1])
 					except:
 						pass
-				thisserver = [rhost, rport]
+
+				check = ""
+				if len(lineparts) > 1:
+					i = 1
+					while i < len(lineparts):
+						checkdata.append(lineparts[i])
+						i += 1
+
+				thisserver = [rhost, rport, checkdata]
 				if not thisserver in serverlist:
 					serverlist.append(thisserver)
 	else:
@@ -499,6 +602,7 @@ if __name__ == "__main__":
 
 	showBanner()
 	alertbefore = 30
+	showverbose = False
 
 	arguments = []
 	if len(sys.argv) >= 2:
@@ -537,6 +641,9 @@ if __name__ == "__main__":
 			except:
 				pass
 
+	if "v" in args:
+		showverbose = True
+
 	print ("[+] Current date: %s" % getNow())
 	print ("[+] Warn about upcoming expirations in less than %d days" % alertbefore)
 
@@ -556,6 +663,6 @@ if __name__ == "__main__":
 		mailhandler.sendmail(info, content, 'Email test')
 		sys.exit(0)
 
-	checkcerts(certconfigfile, mailconfigfile, alertbefore)
+	checkcerts(certconfigfile, mailconfigfile, alertbefore,showverbose)
 
 	

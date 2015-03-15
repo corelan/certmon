@@ -2,7 +2,9 @@ certmon
 =======
 
 certmon.py is a simple certificate expiration monitor script.  It will connect to a given server on a given port, dump the certificate, and check if the certificate has expired or not. Additionally, it will also report if a certificate is about to expire in x nr of days.  (Default: 30 days)
-The reports will be sent via email, allowing you to schedule the script to run on regular intervals.
+On top of that, you can check the contents of certain fields in the certificate & see if it contains a keyword that should be there (to see if the certificate has been changed).
+
+Reports will be sent via email, allowing you to schedule the script to run on regular intervals.
 
 This script requires Python v3 and has been written/tested on Windows 7.
 (Unless you know how to fix OpenSSL on Mac/Linux, please run this script on Windows only, with administrator privileges)
@@ -59,6 +61,8 @@ _/ ___\/ __ \_  __ \   __\/     \ /  _ \ /    \
      -w <nr>              : Warn of upcoming expiration x number of days in advance (default: 30)
 
      -mail                : Test e-mail configuration
+
+     -v                   : Show verbose information about the certificates
 ```
 
 
@@ -88,6 +92,34 @@ Syntax:
 hostname:port
 ```
 (only specify one hostname:port combination per line)
+
+If you want certmon to also monitor the certificate itself, you can specify which keywords it should contain in certain fields. Supported fields are:
+
+```
+subject
+issuer
+version
+serial
+```
+
+Example:  Let's say I want to monitor the certificate on www.corelan.be, and I want to be sure that the subject field contains 'www.corelan.be', the issuer field contains the keyword 'StartCom', and the serial number field contains '1056083', then the line inside the certmon.conf file should look like this:
+
+```
+www.corelan.be:443;issuer=StartCom;serial=1056083;subject=www.corelan.be
+```
+
+This configuration will trigger the following behaviour:
+
+If the certificate on www.corelan.be (port 443) will expire in 30 days or less, you will get an email warning.
+
+If the certificate on www.corelan.be (port 443) has expired, you will get an email alert.
+
+If one of the 3 fields doesn't contain the corresponding keywords, you will get an email alert.
+
+
+(Hint: If you want to know what exactly is inside the various fields, simply use option -v)
+
+Note: The field compliance check will be performed against a lowercase conversion of the field & the keyword.
 
 
 certmon_smtp.conf syntax
