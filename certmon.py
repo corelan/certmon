@@ -304,6 +304,19 @@ def checkcerts(certconfigfile, mailconfigfile, alertbefore, showverbose):
 
     return
 
+# -----  Pseudo Code  -----
+#
+#  open_conf()
+#  generate a list of records to scan
+#  generate a list of certifactes from the records
+#  cert.check_expiration
+#  cert.check_value_changes
+#  create warn, expired, and value change list from certificates
+#  for each mailing list generate and send an email
+#    
+#  
+
+
 # ----- New Functions -----
 
 def changed_cert_info(cert=None):
@@ -348,7 +361,7 @@ class Record:
 class MailList:
 
     def __init__(self, mailer=None):
-        self.msg_list = []
+        self.cert_msgs = []
         self.footer = "\n\nThis report has been auto-generated with certmon.py - %s - %s\n " % (siteurl, getNow())
         self.body_header = "Hi,\n\n"
         self.body_header += "The following certificates may have been Xed:\n\n"
@@ -512,10 +525,10 @@ class CertmonConf:
     def close(self):
         self.certconfigfile.close()
 
-    def load(self, certconfig_filename=''):
+    def load(self):
         # NOTE not sure if should be checking for just str xor unicode
-        if certconfig_filename != '' or not isinstance(
-                certconfig_filename, (str, unicode)):
+        if certconfig_filename == None or not isinstance(certconfig_filename, (str, unicode)):
+            # NOTE probably should rais an error here
             return
         # NOTE should verify is string
         self.open(certconfig_filename)
@@ -568,9 +581,6 @@ class CertmonConf:
 
     def getRecords(self):
         pass
-
-    def getServerlist(self):
-        return self.serverlist
 
 
 class MailConfig:
