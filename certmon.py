@@ -326,23 +326,52 @@ def changed_cert_info(cert=None):
         print("      Expected to contain: '%s'" % fieldcheck["serial"])
 
 
-def cert_changed():
-    pass
-
-def warn_list():
-    pass
-
-def expire_list():
-    pass
-
-
 # ----- classes -----
+
+class Record:
+
+    def __init__(self):
+        self.fields_to_check = {}
+        self.host = ''
+        self.port = ''
+        self.IPs = ''
+
+    def _get_IPs(targetrecord):
+        # Note this needs null error validation and try,except block
+        self.IPs = [socket.gethostbyname(targethost)]
+
+    def fetch_cert(self):
+        pass
+
+
 
 class MailList:
 
     def __init__(self, mailer=None):
-        self._footer = "\n\nThis report has been auto-generated with certmon.py - %s - %s\n " % (siteurl, getNow())
-        self.list = []
+        self.msg_list = []
+        self.footer = "\n\nThis report has been auto-generated with certmon.py - %s - %s\n " % (siteurl, getNow())
+        self.body_header = "Hi,\n\n"
+        self.body_header += "The following certificates may have been Xed:\n\n"
+        self.subject="Certificate Alert (certmon.py)"
+
+    def gen_mail_body(self):
+        mail_body = self.body_header
+        for cert_msg in self.msg_list:
+            mail_body += cert_msg
+            mail_body += "-" * 75
+            mail_body += "\n" 
+        mail_body += "\n\n"
+        mail_body += self._footer
+
+        return mail_body
+
+    def send(self):
+        # NOTE should this be mail content be a method?
+        mailer.sendmail(self.mail_body(), mailsubject=self._subject)
+        print("\n[+] Sending email (Changed Certificates)")
+
+
+
 
 class Cert:
     def __init__(self):
@@ -423,13 +452,13 @@ class Cert:
         msg += "  Serial: {}\n".format(self.serial)
 
         if not cert.subjectok:
-            thismsg += "** Subject field does not contain '%s'\n" % fieldcheck["subject"]
+            thismsg += "** Subject field does not contain '{}'\n".format(fieldcheck["subject"])
         if not cert.issuerok:
-            thismsg += "** Issuer field does not contain '%s'\n" % fieldcheck["issuer"]
+            thismsg += "** Issuer field does not contain '{}'\n".format(fieldcheck["issuer"])
         if not cert.versionok:
-            thismsg += "** Version field does not contain '%s'\n" % fieldcheck["version"]
+            thismsg += "** Version field does not contain '{}'\n".format(fieldcheck["version"])
         if not cert.serialok:
-            thismsg += "** Serial field does not contain '%s'\n" % fieldcheck["serial"]
+            thismsg += "** Serial field does not contain '{}'\n".format(fieldcheck["serial"])
 
         return msg
 
@@ -490,10 +519,10 @@ class CertmonConf:
             return
         # NOTE should verify is string
         self.open(certconfig_filename)
-        self.parse()
+        self._parse()
         self.close()
 
-    def parse(self):
+    def _parse(self):
         content = self.certconfigfile.readlines()
         for l in content:
             checkdata = []
@@ -521,6 +550,24 @@ class CertmonConf:
                 thisserver = [rhost, rport, checkdata]
                 if not thisserver in serverlist:
                     self.serverlist.append(thisserver)
+
+                    fieldcheck = {}
+            for checkitem in checkdata:
+                thisitemparts = checkitem.split("=")
+                if len(thisitemparts) > 1:
+                    fieldname = thisitemparts[0].lower().replace(" ", "")
+                    remainingparts = thisitemparts[1:]
+                    fieldkeyword = "=".join(x for x in remainingparts)
+                    fieldkeyword = fieldkeyword.lower().replace(
+                        "\n",
+                        "").replace(
+                        "\r",
+                        "")
+                    if not fieldname in fieldcheck:
+                        fieldcheck[fieldname] = fieldkeyword
+
+    def getRecords(self):
+        pass
 
     def getServerlist(self):
         return self.serverlist
