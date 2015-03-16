@@ -137,6 +137,8 @@ def checkcerts(certconfigfile,mailconfigfile,alertbefore,showverbose):
 			for thisip in targetips:
 				print ("\n[+] Checking %s (%s:%d)" % (thisip,targethost,targetport))
 				target = (thisip,targetport)
+				if len(targetips) == 1:
+					target = (targethost,targetport)
 				try:
 					certinfo = ssl.get_server_certificate(target)
 					certinfo = certinfo.replace("=-----END","=\n-----END")
