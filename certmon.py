@@ -313,7 +313,7 @@ def checkcerts(certconfigfile, mailconfigfile, alertbefore, showverbose):
 #  cert.check_value_changes
 #  create warn, expired, and value change list from certificates
 #  for each mailing list generate and send an email
-#    
+#  
 #  
 
 
@@ -343,18 +343,25 @@ def changed_cert_info(cert=None):
 
 class Record:
 
-    def __init__(self):
+    def __init__(self, rhost, rport, checkdata, fieldcheck):
         self.fields_to_check = {}
-        self.host = ''
-        self.port = ''
-        self.IPs = ''
+        self.host = rhost
+        self.port = rport
+        self.checkdata = checkdata
+        self.fieldcheck = fieldcheck
+        self.IPs = None
 
-    def _get_IPs(targetrecord):
+        self._get_IPs()
+
+    def _get_IPs(self):
         # Note this needs null error validation and try,except block
-        self.IPs = [socket.gethostbyname(targethost)]
+        self.IPs = [socket.gethostbyname(self.host)]
 
-    def fetch_cert(self):
-        pass
+    def fetch_certs(self):
+        certs = []
+        for ip in self.IPs:
+            certs.append(Cert(ip=ip, port=self.port, fieldcheck=self.fieldcheck))
+        return certs
 
 
 
@@ -387,7 +394,11 @@ class MailList:
 
 
 class Cert:
-    def __init__(self):
+    def __init__(self, ip=None, port=None, fieldcheck=None):
+        self.ip = ip
+        self.port = port
+        self.fieldcheck = fieldcheck
+
         self.x509 = None
         self.certinfo = None
 
@@ -408,38 +419,51 @@ class Cert:
         self.certchanged = False
 
         self.expire_date = None
-        self.alterbefore_date = None
+        self.alertbefore_date = 30
 
+        if ip != None and port != None:
+            self.fetch()
+            self.parse()
 
+ 
     def fetch(self):
-        self.certinfo = ssl.get_server_certificate(target)
+        self.certinfo = ssl.get_server_certificate((self.ip, self.port))
 
     def parse(self):
         # Note - need to examine why the string replacement needs to happen
         certinfo = self.certinfo.replace("=-----END", "=\n-----END")
-        x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, certinfo)
+        self.x509 = OpenSSL.crypto.load_certificate(OpenSSL.crypto.FILETYPE_PEM, certinfo)
 
-        self.issuer = x509.get_issuer()
-        self.serial = x509.get_serial_number()
-        self.subject = x509.get_subject()
-        self.version = x509.get_version()
+        self.issuer = self.x509.get_issuer()
+        self.serial = self.x509.get_serial_number()
+        self.subject = self.x509.get_subject()
+        self.version = self.x509.get_version()
 
-    def expired(self):
+        self._check_fields()
+        self._parse_cert_datetime()
+
+    def is_expired(self):
         delta = self.expire_date - self._curr_date()
         if delta.days < 0:
             print("    *** CERTIFICATE HAS EXPIRED ON %s (%d days ago) ***" %
                   (self.expire_date, (delta.days * -1)))
             return True
-        elif delta.days == 0:
+        else:
+            return False
+
+    def is_alertbefore(self):
+        delta = self.expire_date - self._curr_date()
+        if delta.days == 0:
             print("    *** CERTIFICATE EXPIRES TODAY ***")
-        elif delta.days < self.alterbefore_date:
+            return True
+        elif delta.days < self.alertbefore_date:
             print("    ** Warning: certificate will expire in less than %d days" % self.alertbefore_date)
             # NOTE return True xor False?!
+            return True
         else:
             print("    Cert expiration OK")
             print("    Note: Certificate will expire on %s (%d days from now)" % (self.expire_date, delta.days))
-
-        return False
+            return False
 
     def changed(self):
         self._check_fields()
@@ -476,21 +500,21 @@ class Cert:
         return msg
 
     def _check_fields(self):
-        for fieldname in fieldcheck:
+        for fieldname in self.fieldcheck:
             if fieldname == "issuer":
-                if not fieldcheck[fieldname] in str(issuer).lower():
+                if not self.fieldcheck[fieldname] in str(self.issuer).lower():
                     self.issuerok = False
                     self.certchanged = True
             elif fieldname == "subject":
-                if not fieldcheck[fieldname] in str(subject).lower():
+                if not self.fieldcheck[fieldname] in str(self.subject).lower():
                     self.subjectok = False
                     self.certchanged = True
             elif fieldname == "version":
-                if not fieldcheck[fieldname] in str(version).lower():
+                if not self.fieldcheck[fieldname] in str(self.version).lower():
                     self.versionok = False
                     self.certchanged = True
             elif fieldname == "serial":
-                if not fieldcheck[fieldname] in str(serial).lower():
+                if not self.fieldcheck[fieldname] in str(self.serial).lower():
                     self.serialok = False
                     self.certchanged = True
 
@@ -498,9 +522,9 @@ class Cert:
         return datetime.datetime.now()
 
     def _parse_cert_datetime(self):
-        expire_date_str = str(x509.get_notAfter())
-        expire_date_str.replace("b'", "").replace("'", "")
-        self.expire_date = datetime.datetime.strptime(expirdatestr, "%Y%m%d%H%M%SZ")
+        expire_date_str = str(self.x509.get_notAfter()).replace("b'", "").replace("'", "")
+        self.expire_date = datetime.datetime.strptime(expire_date_str, "%Y%m%d%H%M%SZ")
+
 
     def _show_verbose(self):
         pass
@@ -510,6 +534,7 @@ class CertmonConf:
 
     def __init__(self, certconfig_filename=''):
         self.serverlist = []
+        self.records = []
         self.certconfigfile = None
 
         if certconfig_filename != '':
@@ -525,9 +550,9 @@ class CertmonConf:
     def close(self):
         self.certconfigfile.close()
 
-    def load(self):
+    def load(self, certconfig_filename=''):
         # NOTE not sure if should be checking for just str xor unicode
-        if certconfig_filename == None or not isinstance(certconfig_filename, (str, unicode)):
+        if certconfig_filename == None or not isinstance(certconfig_filename, str):
             # NOTE probably should rais an error here
             return
         # NOTE should verify is string
@@ -561,7 +586,7 @@ class CertmonConf:
                         i += 1
 
                 thisserver = [rhost, rport, checkdata]
-                if not thisserver in serverlist:
+                if not thisserver in self.serverlist:
                     self.serverlist.append(thisserver)
 
                     fieldcheck = {}
@@ -578,9 +603,10 @@ class CertmonConf:
                         "")
                     if not fieldname in fieldcheck:
                         fieldcheck[fieldname] = fieldkeyword
+            self.records.append(Record(rhost, rport, checkdata, fieldcheck))
 
     def getRecords(self):
-        pass
+        return self.records
 
 
 class MailConfig:
@@ -969,4 +995,15 @@ if __name__ == "__main__":
         mailhandler.sendmail(info, content, 'Email test')
         sys.exit(0)
 
-    checkcerts(certconfigfile, mailconfigfile, alertbefore, showverbose)
+    all_certs = []
+    certmon_conf = CertmonConf(certconfigfile)
+    for record in certmon_conf.records:
+        all_certs += record.fetch_certs()
+
+    for cert in all_certs:
+        cert.is_expired()
+        cert.is_alertbefore()
+        if not cert.changed():
+            print("CERT NOT CHANGED")
+
+    #checkcerts(certconfigfile, mailconfigfile, alertbefore, showverbose)
