@@ -306,12 +306,20 @@ class Cert:
         msg += "  Serial: {}\n".format(self.serial)
 
         if not cert.subjectok:
+            print("    Subject field contains '%s'" % subject)
+            print("    Expected to contain: '%s'" % fieldcheck["subject"])
             thismsg += "** Subject field does not contain '{}'\n".format(fieldcheck["subject"])
         if not cert.issuerok:
+            print("    Issuer field contains '%s'" % issuer)
+            print("    Expected to contain: '%s'" %fieldcheck["issuer"])
             thismsg += "** Issuer field does not contain '{}'\n".format(fieldcheck["issuer"])
         if not cert.versionok:
+            print("    Version field contains '%s'" % version)
+            print("    Expected to contain: '%s'" % fieldcheck["version"])
             thismsg += "** Version field does not contain '{}'\n".format(fieldcheck["version"])
         if not cert.serialok:
+            print("    Serial field contains '%s'" % serial)
+            print("      Expected to contain: '%s'" % fieldcheck["serial"])
             thismsg += "** Serial field does not contain '{}'\n".format(fieldcheck["serial"])
 
         return msg
