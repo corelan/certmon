@@ -84,28 +84,6 @@ def check_port(host, port):
         return False
 
 
-def createMsg(x509, targethost, targetport, targetip, expirdate, diff):
-    msg = ""
-    issuer = x509.get_issuer()
-    serial = x509.get_serial_number()
-    subject = x509.get_subject()
-    version = x509.get_version()
-
-    extratxt = ""
-    if diff < 0:
-        extratxt = " (%d days ago)" % (diff * -1)
-    else:
-        extratxt = " (will expire in %d days)" % (diff)
-
-    msg += "Host: %s, Port: %d, IP: %s\n" % (targethost, targetport, targetip)
-    msg += "  Subject: %s\n" % subject
-    msg += "  Expiration date: %s%s\n" % (expirdate, extratxt)
-    msg += "  Issuer: %s\n" % issuer
-    msg += "  Version: %s\n" % version
-    msg += "  Serial: %s\n" % serial
-
-    return msg
-
 
 def getIPs(targetrecord):
     targethost = targetrecord[0]
