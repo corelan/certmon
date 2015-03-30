@@ -84,31 +84,6 @@ def check_port(host, port):
         return False
 
 
-
-def getIPs(targetrecord):
-    targethost = targetrecord[0]
-    targetport = targetrecord[1]
-    checkdata = targetrecord[2]
-
-    fieldcheck = {}
-
-    for checkitem in checkdata:
-        thisitemparts = checkitem.split("=")
-        if len(thisitemparts) > 1:
-            fieldname = thisitemparts[0].lower().replace(" ", "")
-            remainingparts = thisitemparts[1:]
-            fieldkeyword = "=".join(x for x in remainingparts)
-            fieldkeyword = fieldkeyword.lower().replace(
-                "\n",
-                "").replace(
-                "\r",
-                "")
-            if not fieldname in fieldcheck:
-                fieldcheck[fieldname] = fieldkeyword
-
-    return [socket.gethostbyname(targethost)]
-
-
 # ----- classes -----
 
 class Record:
