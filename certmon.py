@@ -109,28 +109,6 @@ def getIPs(targetrecord):
     return [socket.gethostbyname(targethost)]
 
 
-# ----- New Functions -----
-
-def changed_cert_info(cert=None):
-    print("    *** CERTIFICATE MAY HAVE BEEN CHANGED ***")
-
-    if not cert.subjectok:
-        print("    Subject field contains '%s'" % subject)
-        print("    Expected to contain: '%s'" % fieldcheck["subject"])
-        thismsg += "** Subject field does not contain '%s'\n" % fieldcheck["subject"]
-    if not cert.issuerok:
-        print("    Issuer field contains '%s'" % issuer)
-        print("    Expected to contain: '%s'" %fieldcheck["issuer"])
-        thismsg += "** Issuer field does not contain '%s'\n" % fieldcheck["issuer"]
-    if not cert.versionok:
-        print("    Version field contains '%s'" % version)
-        print("    Expected to contain: '%s'" % fieldcheck["version"])
-        thismsg += "** Version field does not contain '%s'\n" % fieldcheck["version"]
-    if not cert.serialok:
-        print("    Serial field contains '%s'" % serial)
-        print("      Expected to contain: '%s'" % fieldcheck["serial"])
-
-
 # ----- classes -----
 
 class Record:
