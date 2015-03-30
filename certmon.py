@@ -26,11 +26,16 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import traceback
+import time
 
 
 curdate = datetime.datetime.now()
 siteurl = "https://github.com/corelan/certmon"
 
+def check_python_version():
+    if sys.version_info < (3, 0, 0):
+        sys.stderr.write("You need python v3 or later to run this script\n")
+        exit(1)
 
 def getNow():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -363,8 +368,6 @@ class Record:
             certs.append(Cert(ip=ip, port=self.port, fieldcheck=self.fieldcheck))
         return certs
 
-
-
 class MailList:
 
     def __init__(self, mailer=None):
@@ -372,25 +375,51 @@ class MailList:
         self.footer = "\n\nThis report has been auto-generated with certmon.py - %s - %s\n " % (siteurl, getNow())
         self.body_header = "Hi,\n\n"
         self.body_header += "The following certificates may have been Xed:\n\n"
-        self.subject="Certificate Alert (certmon.py)"
+        self.subject="[certmon.py] mail list subject"
+        self.send_verbose = ""
+        self.mailer = mailer
 
     def gen_mail_body(self):
         mail_body = self.body_header
-        for cert_msg in self.msg_list:
+        for cert_msg in self.cert_msgs:
             mail_body += cert_msg
             mail_body += "-" * 75
             mail_body += "\n" 
         mail_body += "\n\n"
-        mail_body += self._footer
+        mail_body += self.footer
 
         return mail_body
 
     def send(self):
         # NOTE should this be mail content be a method?
-        mailer.sendmail(self.mail_body(), mailsubject=self._subject)
-        print("\n[+] Sending email (Changed Certificates)")
+        if len(self.cert_msgs) > 0:
+            print(self.gen_mail_body())
+            self.mailer.sendmail(self.gen_mail_body().split('\n'), mailsubject=self.subject)
+            print("\n[+] Sending email ({})".format(self.send_verbose))
 
 
+def init_changed_mail_list(mailer=None):
+    changed_list = MailList(mailer)
+    changed_list.body_header = "Hi,\n\n"
+    changed_list.body_header += "The following certificates may have been changed:\n\n"
+    changed_list.subject="Certificate Change Alert (certmon.py)"
+    return changed_list
+
+
+def init_warn_mail_list(mailer=None):
+    warn_list = MailList(mailer)
+    warn_list.body_header = "Hi,\n\n"
+    warn_list.body_header += "The following certificates will expire in less than %d days:\n\n" % alertbefore
+    warn_list.subject="Upcoming Certificate Expiration Warning (certmon.py)"
+    return warn_list
+
+
+def init_expired_mail_list(mailer=None):
+    expired_list = MailList(mailer)
+    expired_list.body_header = "Hi,\n\n"
+    expired_list.body_header += "The following certificates have expired:\n\n"
+    expired_list.subject="Expired Certificates Alert (certmon.py)"
+    return expired_list
 
 
 class Cert:
@@ -420,6 +449,7 @@ class Cert:
 
         self.expire_date = None
         self.alertbefore_date = 30
+        self.delta = None
 
         if ip != None and port != None:
             self.fetch()
@@ -443,29 +473,29 @@ class Cert:
         self._parse_cert_datetime()
 
     def is_expired(self):
-        delta = self.expire_date - self._curr_date()
-        if delta.days < 0:
+        self.delta = self.expire_date - self._curr_date()
+        if self.delta.days < 0:
             print("    *** CERTIFICATE HAS EXPIRED ON %s (%d days ago) ***" %
-                  (self.expire_date, (delta.days * -1)))
+                  (self.expire_date, (self.delta.days * -1)))
             return True
         else:
             return False
 
     def is_alertbefore(self):
-        delta = self.expire_date - self._curr_date()
-        if delta.days == 0:
+        self.delta = self.expire_date - self._curr_date()
+        if self.delta.days == 0:
             print("    *** CERTIFICATE EXPIRES TODAY ***")
             return True
-        elif delta.days < self.alertbefore_date:
+        elif self.delta.days < self.alertbefore_date:
             print("    ** Warning: certificate will expire in less than %d days" % self.alertbefore_date)
             # NOTE return True xor False?!
             return True
         else:
             print("    Cert expiration OK")
-            print("    Note: Certificate will expire on %s (%d days from now)" % (self.expire_date, delta.days))
+            print("    Note: Certificate will expire on %s (%d days from now)" % (self.expire_date, self.delta.days))
             return False
 
-    def changed(self):
+    def is_changed(self):
         self._check_fields()
         return self.certchanged
 
@@ -474,14 +504,14 @@ class Cert:
         msg = ""
 
         # NOTE handle the DIFF
-
+        diff = self.delta.days
         extratxt = ""
         if diff < 0:
             extratxt = " ({} days ago)".format(diff * -1)
         else:
             extratxt = " (will expire in {} days)".format(diff)
 
-        msg += "Host: {}, Port: {}, IP: {}\n".format(targethost, targetport, targetip)
+        msg += "Host: {}, Port: {}, IP: {}\n".format(self.target_host, self.target_port, self.target_ip)
         msg += "  Subject: {}\n".format(self.subject)
         msg += "  Expiration date: {}{}\n".format(self.expire_date, extratxt)
         msg += "  Issuer: {}\n".format(self.issuer)
@@ -896,16 +926,22 @@ class Mailer:
                         smtp_error))
             except smtplib.SMTPRecipientsRefused as e:
                 print("     ** ERROR Recipients refused")
+                print(e)
             except smtplib.SMTPDataError as e:
                 print("     ** ERROR Server refused to accept the data")
+                print(e)
             except smtplib.SMTPConnectError as e:
                 print("     ** ERROR establishing connection to server")
+                print(e)
             except smtplib.SMTPHeloError as e:
                 print("     ** ERROR HELO Error")
+                print(e)
             except smtplib.SMTPAuthenticationError as e:
                 print("     ** ERROR Authentication")
+                print(e)
             except smtplib.SMTPException as e:
                 print("     ** ERROR Sending email")
+                print(e)
             except:
                 print("     ** ERROR Unable to send email !")
 
@@ -919,9 +955,7 @@ class Mailer:
 
 if __name__ == "__main__":
 
-    if sys.version_info < (3, 0, 0):
-        sys.stderr.write("You need python v3 or later to run this script\n")
-        exit(1)
+    check_python_version()
 
     mailconfigerror = True
     workingfolder = os.getcwd()
@@ -995,15 +1029,27 @@ if __name__ == "__main__":
         mailhandler.sendmail(info, content, 'Email test')
         sys.exit(0)
 
+    mailhandler = Mailer(mailconfigfile)
+    warn_list = init_warn_mail_list(mailer=mailhandler)
+    expired_list = init_expired_mail_list(mailer=mailhandler)
+    changed_list = init_changed_mail_list(mailer=mailhandler)
+
     all_certs = []
     certmon_conf = CertmonConf(certconfigfile)
     for record in certmon_conf.records:
         all_certs += record.fetch_certs()
 
     for cert in all_certs:
-        cert.is_expired()
-        cert.is_alertbefore()
-        if not cert.changed():
-            print("CERT NOT CHANGED")
+        if cert.is_expired():
+            expired_list.cert_msgs.append(cert.msg())
+        if cert.is_alertbefore():
+            warn_list.cert_msgs.append(cert.msg())
+        if cert.is_changed():
+            changed_list.cert_msgs.append(cert.msg())
+
+    expired_list.send()
+    warn_list.send()
+    changed_list.send()
+ 
 
     #checkcerts(certconfigfile, mailconfigfile, alertbefore, showverbose)
