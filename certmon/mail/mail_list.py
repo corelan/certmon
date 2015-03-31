@@ -1,3 +1,10 @@
+siteurl = "https://github.com/corelan/certmon"
+
+import datetime
+
+def getNow():
+    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 class MailList:
 
     def __init__(self, mailer=None):

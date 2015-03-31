@@ -1,3 +1,22 @@
+from .mail_config import MailConfig
+
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+
+import socket
+from socket import gethostname
+
+siteurl = "https://github.com/corelan/certmon"
+
+def check_port(host, port):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.connect((host, port))
+        return True
+    except:
+        return False
+
 class Mailer:
 
     """
