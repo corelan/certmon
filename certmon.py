@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 #    certmon.py - Certificate Expiration monitor
 #    Copyright (C) 2015 - Peter 'corelanc0d3r' Van Eeckhoutte - www.corelan.be
 #
