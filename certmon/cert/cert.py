@@ -19,7 +19,6 @@ import OpenSSL
 import datetime
 import logging
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class Cert:
@@ -84,15 +83,15 @@ class Cert:
     def is_alertbefore(self):
         self.delta = self.expire_date - self._curr_date()
         if self.delta.days == 0:
-            logger.info("\t*** CERTIFICATE EXPIRES TODAY ***")
+            logger.info("*** CERTIFICATE EXPIRES TODAY ***")
             return True
         elif self.delta.days < self.alertbefore_date:
-            logger.info("\t** Warning: certificate will expire in less than %d days" % self.alertbefore_date)
+            logger.info("** Warning: certificate will expire in less than %d days" % self.alertbefore_date)
             # NOTE return True xor False?!
             return True
         else:
-            logger.info("\tCert expiration OK")
-            logger.info("\tNote: Certificate will expire on %s (%d days from now)" % (self.expire_date, self.delta.days))
+            logger.info("Cert expiration OK")
+            logger.info("Certificate will expire on %s (%d days from now)" % (self.expire_date, self.delta.days))
             return False
 
     def is_changed(self):
@@ -119,20 +118,20 @@ class Cert:
         msg += "  Serial: {}\n".format(self.serial)
 
         if not self.subjectok:
-            logger.info("\tSubject field contains '%s'" % subject)
-            logger.info("\tExpected to contain: '%s'" % fieldcheck["subject"])
+            logger.info("Subject field contains '%s'" % subject)
+            logger.info("Expected to contain: '%s'" % fieldcheck["subject"])
             thismsg += "** Subject field does not contain '{}'\n".format(fieldcheck["subject"])
         if not self.issuerok:
-            logger.info("\tIssuer field contains '%s'" % issuer)
-            logger.info("\tExpected to contain: '%s'" %fieldcheck["issuer"])
+            logger.info("Issuer field contains '%s'" % issuer)
+            logger.info("Expected to contain: '%s'" %fieldcheck["issuer"])
             thismsg += "** Issuer field does not contain '{}'\n".format(fieldcheck["issuer"])
         if not self.versionok:
-            logger.info("\tVersion field contains '%s'" % version)
-            logger.info("\tExpected to contain: '%s'" % fieldcheck["version"])
+            logger.info("Version field contains '%s'" % version)
+            logger.info("Expected to contain: '%s'" % fieldcheck["version"])
             thismsg += "** Version field does not contain '{}'\n".format(fieldcheck["version"])
         if not self.serialok:
-            logger.info("\tSerial field contains '%s'" % serial)
-            logger.info("\tExpected to contain: '%s'" % fieldcheck["serial"])
+            logger.info("Serial field contains '%s'" % serial)
+            logger.info("Expected to contain: '%s'" % fieldcheck["serial"])
             thismsg += "** Serial field does not contain '{}'\n".format(fieldcheck["serial"])
 
         return msg

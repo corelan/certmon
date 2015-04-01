@@ -24,7 +24,6 @@ import socket
 from socket import gethostname
 import logging
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 siteurl = "https://github.com/corelan/certmon"
@@ -73,7 +72,7 @@ class Mailer:
                 (self.server, self.port))
             if check_port(self.server, self.port):
                 # fill out the rest and terminate the loop
-                logger.info("\tYup, port is open")
+                logger.info("Yup, port is open")
                 if "timeout" in thisconfig:
                     self.timeout = int(thisconfig["timeout"])
                 if "auth" in thisconfig:
@@ -126,65 +125,59 @@ class Mailer:
         while not noerror:
             try:
                 logger.info(
-                    "[+] Connecting to %s on port %d" %
+                    "Connecting to %s on port %d" %
                     (self.server, self.port))
                 s = smtplib.SMTP(
                     self.server,
                     self.port,
                     'minicase',
                     self.timeout)
-                logger.info("[+] Connected")
+                logger.info("Connected")
                 if self.usetls:
-                    logger.info("[+] Issuing STARTTLS")
+                    logger.info("Issuing STARTTLS")
                     s.starttls()
-                    logger.info("[+] STARTTLS established")
+                    logger.info("STARTTLS established")
                 if self.requirelogin:
-                    logger.info("[+] Authenticating")
+                    logger.info("Authenticating")
                     s.login(self.login, self.password)
-                    logger.info("[+] Authenticated")
-                logger.info("[+] Sending email")
+                    logger.info("Authenticated")
+                logger.info("Sending email")
                 s.sendmail(self.to, [self.to], msg.as_string())
-                logger.info("[+] Mail sent, disconnecting")
+                logger.info("Mail sent, disconnecting")
                 s.quit()
                 noerror = True
             except smtplib.SMTPServerDisconnected as e:
-                logger.error("\t** ERROR, Server disconnected unexpectedly\n\tThis is probably okay")
+                logger.error("Server disconnected unexpectedly. This is probably okay")
                 noerror = True
             except smtplib.SMTPResponseException as e:
                 logger.error(
-                    "\t** ERROR Server returned %s : %s" %
+                    "Server returned %s : %s" %
                     (str(
                         e.smtp_code),
                         e.smtp_error))
             except smtplib.SMTPSenderRefused as e:
                 logger.error(
-                    "\t** ERROR Sender refused %s : %s" %
+                    "Sender refused %s : %s" %
                     (str(
                         e.smtp_code),
                         smtp_error))
             except smtplib.SMTPRecipientsRefused as e:
-                logger.error("\t** ERROR Recipients refused")
-                logger.error(e)
+                logger.error("Recipients refused", exc_info=True)
             except smtplib.SMTPDataError as e:
-                logger.error("\t** ERROR Server refused to accept the data")
-                logger.error(e)
+                logger.error("Server refused to accept the data", exc_info=True)
             except smtplib.SMTPConnectError as e:
-                logger.error("\t** ERROR establishing connection to server")
-                logger.error(e)
+                logger.error("Error establishing connection to server", exc_info=True)
             except smtplib.SMTPHeloError as e:
-                logger.error("\t** ERROR HELO Error")
-                logger.error(e)
+                logger.error("HELO Error", exc_info=True)
             except smtplib.SMTPAuthenticationError as e:
-                logger.error("\t** ERROR Authentication")
-                logger.error(e)
+                logger.error("Authentication", exc_info=True)
             except smtplib.SMTPException as e:
-                logger.error("\t** ERROR Sending email")
-                logger.error(e)
+                logger.error("Sending email", exc_info=True)
             except:
-                logger.error("\t** ERROR Unable to send email !")
+                logger.error("Unable to send email !")
 
             if not noerror:
-                logger.info("     I'll try again in %d seconds" % thistimeout)
+                logger.info("I'll try again in %d seconds" % thistimeout)
                 time.sleep(thistimeout)
                 if thistimeout < 1200:
                     thistimeout += 5

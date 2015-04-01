@@ -19,7 +19,6 @@ siteurl = "https://github.com/corelan/certmon"
 import datetime
 import logging
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def getNow():
@@ -52,4 +51,3 @@ class MailList:
         if len(self.cert_msgs) > 0:
             #print(self.gen_mail_body())
             self.mailer.sendmail(self.gen_mail_body().split('\n'), mailsubject=self.subject)
-            logger.info("\n[+] Sending email ({})".format(self.send_verbose))

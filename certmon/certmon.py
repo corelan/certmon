@@ -48,8 +48,8 @@ from mail.mail_config import MailConfig
 from cert.record import Record
 from cert.certmon_conf import CertmonConf
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO)
 curdate = datetime.datetime.now()
 siteurl = "https://github.com/corelan/certmon"
 
@@ -127,20 +127,20 @@ if __name__ == "__main__":
     # print(alertbefore)
     # print(showverbose)
 
-    logger.info(" Current date: %s", getNow())
-    logger.warning(" Warn about upcoming expirations in less than %d days", alertbefore)
+    logger.info("Current date: %s", getNow())
+    logger.info("Warn about upcoming expirations in less than %d days", alertbefore)
 
     # check email config file
     cEmailConfig = MailConfig(mailconfigfile)
     if not cEmailConfig.configFileExists():
-        logger.warning(" Oops, email config file %s doesn't exist yet", mailconfigfile)
+        logger.warning("Oops, email config file %s doesn't exist yet", mailconfigfile)
         cEmailConfig.initConfigFile()
     else:
-        logger.info(" Using mail config file %s", mailconfigfile)
+        logger.info("Using mail config file %s", mailconfigfile)
         cEmailConfig.readConfigFile()
 
     if arguments['--test-mail']:
-        logger.info(" Test Mail Configuration")
+        logger.info("Test Mail Configuration")
         content = []
         mailhandler = Mailer(mailconfigfile)
         info = ['certmon.py email test']
