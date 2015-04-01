@@ -24,15 +24,15 @@ import traceback
 
 __doc__ = """certmon - Monitor TLS Certificates
 
-Usage: certmon.py
-    certmon.py [-c=<certconfigfile>] [-s=<smtpconfigfile>] [-w=<nr>]
+Usage:
+    certmon.py [-v] [-c=<certconfigfile>] [-s=<smtpconfigfile>] [-w=<nr>]
     certmon.py (-h | --help)
     certmon.py -mail
 
 Options:
     -h --help               Show this help screen.
-    -c=<certconfigfile>     Full path to cert config file [default: ./certmon.conf].
-    -s=<smtpconfigfile>     Full path to smtp config file [default: ./certmon_smtp.conf].
+    -c=<certconfigfile>     Full path to cert config file [default: certmon.conf].
+    -s=<smtpconfigfile>     Full path to smtp config file [default: certmon_smtp.conf].
     -w=<nr>                 Warn of upcoming expiration nr of days in advance [default: 30].
     -mail                   Test e-mail configuration.
     -v                      Show verbose information about the certificates.
@@ -128,56 +128,25 @@ if __name__ == "__main__":
 
     check_python_version()
     arguments = docopt(__doc__, version='0.0.1')
-    print(arguments)
 
     mailconfigerror = True
-    workingfolder = os.getcwd()
-    mailconfigfile = os.path.join(workingfolder, "certmon_smtp.conf")
-    certconfigfile = os.path.join(workingfolder, "certmon.conf")
+    mailconfigfile = arguments['-s']
+    certconfigfile = arguments['-c']
+    alertbefore = int(arguments['-w'])
+    showverbose = arguments['-v']
 
     showBanner()
-    alertbefore = 30
-    showverbose = False
+
+    # print(mailconfigfile)
+    # print(certconfigfile)
+    # print(alertbefore)
+    # print(showverbose)
+
+    sys.exit(0)
 
     arguments = []
     if len(sys.argv) >= 2:
         arguments = sys.argv[1:]
-
-    args = {}
-    last = ""
-    for word in arguments:
-        if (word[0] == '-'):
-            word = word.lstrip("-")
-            args[word] = True
-            last = word
-        else:
-            if (last != ""):
-                if str(args[last]) == "True":
-                    args[last] = word
-                else:
-                    args[last] = args[last] + " " + word
-
-    if "h" in args:
-        showSyntax(sys.argv)
-        sys.exit(0)
-
-    if "c" in args:
-        if type(args["c"]).__name__.lower() != "bool":
-            certconfigfile = args["c"]
-
-    if "s" in args:
-        if type(args["s"]).__name__.lower() != "bool":
-            mailconfigfile = args["s"]
-
-    if "w" in args:
-        if type(args["w"]).__name__.lower() != "bool":
-            try:
-                alertbefore = int(args["w"])
-            except:
-                pass
-
-    if "v" in args:
-        showverbose = True
 
     print("[+] Current date: %s" % getNow())
     print(
