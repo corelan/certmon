@@ -22,6 +22,24 @@ import sys
 import datetime
 import traceback
 
+__doc__ = """certmon - Monitor TLS Certificates
+
+Usage: certmon.py
+    certmon.py [-c=<certconfigfile>] [-s=<smtpconfigfile>] [-w=<nr>]
+    certmon.py (-h | --help)
+    certmon.py -mail
+
+Options:
+    -h --help               Show this help screen.
+    -c=<certconfigfile>     Full path to cert config file [default: ./certmon.conf].
+    -s=<smtpconfigfile>     Full path to smtp config file [default: ./certmon_smtp.conf].
+    -w=<nr>                 Warn of upcoming expiration nr of days in advance [default: 30].
+    -mail                   Test e-mail configuration.
+    -v                      Show verbose information about the certificates.
+
+"""
+from docopt import docopt
+
 from mail.mail_list import MailList
 from mail.mailer import Mailer
 from mail.mail_config import MailConfig
@@ -56,6 +74,7 @@ def showSyntax(args):
     print("     -v                   : Show verbose information about the certificates")
     print("")
     return
+
 
 
 def showBanner():
@@ -108,6 +127,8 @@ def init_expired_mail_list(mailer=None):
 if __name__ == "__main__":
 
     check_python_version()
+    arguments = docopt(__doc__, version='0.0.1')
+    print(arguments)
 
     mailconfigerror = True
     workingfolder = os.getcwd()
