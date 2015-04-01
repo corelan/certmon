@@ -21,6 +21,7 @@ import os
 import sys
 import datetime
 import traceback
+import logging
 
 __doc__ = """certmon - Monitor TLS Certificates
 
@@ -47,12 +48,14 @@ from mail.mail_config import MailConfig
 from cert.record import Record
 from cert.certmon_conf import CertmonConf
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 curdate = datetime.datetime.now()
 siteurl = "https://github.com/corelan/certmon"
 
 def check_python_version():
     if sys.version_info < (3, 0, 0):
-        sys.stderr.write("You need python v3 or later to run this script\n")
+        logger.critical("You need python v3 or later to run this script\n")
         exit(1)
 
 def getNow():
@@ -124,26 +127,27 @@ if __name__ == "__main__":
     # print(alertbefore)
     # print(showverbose)
 
-    print("[+] Current date: %s" % getNow())
-    print("[+] Warn about upcoming expirations in less than %d days" % alertbefore)
+    logger.info(" Current date: %s", getNow())
+    logger.warning(" Warn about upcoming expirations in less than %d days", alertbefore)
 
     # check email config file
     cEmailConfig = MailConfig(mailconfigfile)
     if not cEmailConfig.configFileExists():
-        print("[-] Oops, email config file %s doesn't exist yet" % mailconfigfile)
+        logger.warning(" Oops, email config file %s doesn't exist yet", mailconfigfile)
         cEmailConfig.initConfigFile()
     else:
-        print("[+] Using mail config file %s" % mailconfigfile)
+        logger.info(" Using mail config file %s", mailconfigfile)
         cEmailConfig.readConfigFile()
 
     if arguments['--test-mail']:
-        print("[+] Test Mail Configuration")
+        logger.info(" Test Mail Configuration")
         content = []
         mailhandler = Mailer(mailconfigfile)
         info = ['certmon.py email test']
         mailhandler.sendmail(info, content, 'Email test')
         sys.exit(0)
 
+    sys.exit(0)
     mailhandler = Mailer(mailconfigfile)
     warn_list = init_warn_mail_list(mailer=mailhandler)
     expired_list = init_expired_mail_list(mailer=mailhandler)
