@@ -1,5 +1,6 @@
 import socket
 from socket import gethostname
+from .cert import Cert
 
 class Record:
 

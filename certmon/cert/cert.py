@@ -1,3 +1,7 @@
+import ssl
+import OpenSSL
+import datetime
+
 class Cert:
     def __init__(self, ip=None, port=None, fieldcheck=None):
         self.ip = ip

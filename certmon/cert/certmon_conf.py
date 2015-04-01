@@ -1,3 +1,6 @@
+import os
+from .record import Record
+
 class CertmonConf:
 
     def __init__(self, certconfig_filename=''):

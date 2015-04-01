@@ -37,6 +37,7 @@ from mail.mailer import Mailer
 from mail.mail_config import MailConfig
 
 from cert.record import Record
+from cert.certmon_conf import CertmonConf
 
 curdate = datetime.datetime.now()
 siteurl = "https://github.com/corelan/certmon"
