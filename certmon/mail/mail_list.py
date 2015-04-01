@@ -50,6 +50,6 @@ class MailList:
     def send(self):
         # NOTE should this be mail content be a method?
         if len(self.cert_msgs) > 0:
-            print(self.gen_mail_body())
+            #print(self.gen_mail_body())
             self.mailer.sendmail(self.gen_mail_body().split('\n'), mailsubject=self.subject)
-            print("\n[+] Sending email ({})".format(self.send_verbose))
+            logger.info("\n[+] Sending email ({})".format(self.send_verbose))

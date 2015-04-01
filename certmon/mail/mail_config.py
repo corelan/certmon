@@ -76,11 +76,11 @@ class MailConfig:
         for l in filecontent:
             f.write(bytes("%s\n" % l, 'UTF-8'))
         f.close()
-        print("[+] Saved new config file")
+        logger.info(" Saved new config file.")
         return
 
     def initConfigFile(self):
-        print("[+] Creating a new config file.")
+        logger.info(" Creating a new config file.")
         i_server = ""
         i_port = 25
         i_timeout = 300

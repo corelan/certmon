@@ -35,8 +35,8 @@ class CertmonConf:
         if os.path.isfile(certconfig_filename):
             self.certconfigfile = open(certconfig_filename, "r")
         else:
-            print("[-] Oops, file {} does not exist".format(certconfig_filename))
-            print("    Desired format:    host:port   (one entry per line)")
+            logger.error(" Oops, file {} does not exist".format(certconfig_filename))
+            logger.error("\tDesired format:    host:port   (one entry per line)")
 
     def close(self):
         self.certconfigfile.close()

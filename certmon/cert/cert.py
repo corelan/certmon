@@ -75,7 +75,7 @@ class Cert:
     def is_expired(self):
         self.delta = self.expire_date - self._curr_date()
         if self.delta.days < 0:
-            print("    *** CERTIFICATE HAS EXPIRED ON %s (%d days ago) ***" %
+            logger.info("\t*** CERTIFICATE HAS EXPIRED ON %s (%d days ago) ***" %
                   (self.expire_date, (self.delta.days * -1)))
             return True
         else:
@@ -84,15 +84,15 @@ class Cert:
     def is_alertbefore(self):
         self.delta = self.expire_date - self._curr_date()
         if self.delta.days == 0:
-            print("    *** CERTIFICATE EXPIRES TODAY ***")
+            logger.info("\t*** CERTIFICATE EXPIRES TODAY ***")
             return True
         elif self.delta.days < self.alertbefore_date:
-            print("    ** Warning: certificate will expire in less than %d days" % self.alertbefore_date)
+            logger.info("\t** Warning: certificate will expire in less than %d days" % self.alertbefore_date)
             # NOTE return True xor False?!
             return True
         else:
-            print("    Cert expiration OK")
-            print("    Note: Certificate will expire on %s (%d days from now)" % (self.expire_date, self.delta.days))
+            logger.info("\tCert expiration OK")
+            logger.info("\tNote: Certificate will expire on %s (%d days from now)" % (self.expire_date, self.delta.days))
             return False
 
     def is_changed(self):
@@ -119,20 +119,20 @@ class Cert:
         msg += "  Serial: {}\n".format(self.serial)
 
         if not self.subjectok:
-            print("    Subject field contains '%s'" % subject)
-            print("    Expected to contain: '%s'" % fieldcheck["subject"])
+            logger.info("\tSubject field contains '%s'" % subject)
+            logger.info("\tExpected to contain: '%s'" % fieldcheck["subject"])
             thismsg += "** Subject field does not contain '{}'\n".format(fieldcheck["subject"])
         if not self.issuerok:
-            print("    Issuer field contains '%s'" % issuer)
-            print("    Expected to contain: '%s'" %fieldcheck["issuer"])
+            logger.info("\tIssuer field contains '%s'" % issuer)
+            logger.info("\tExpected to contain: '%s'" %fieldcheck["issuer"])
             thismsg += "** Issuer field does not contain '{}'\n".format(fieldcheck["issuer"])
         if not self.versionok:
-            print("    Version field contains '%s'" % version)
-            print("    Expected to contain: '%s'" % fieldcheck["version"])
+            logger.info("\tVersion field contains '%s'" % version)
+            logger.info("\tExpected to contain: '%s'" % fieldcheck["version"])
             thismsg += "** Version field does not contain '{}'\n".format(fieldcheck["version"])
         if not self.serialok:
-            print("    Serial field contains '%s'" % serial)
-            print("      Expected to contain: '%s'" % fieldcheck["serial"])
+            logger.info("\tSerial field contains '%s'" % serial)
+            logger.info("\tExpected to contain: '%s'" % fieldcheck["serial"])
             thismsg += "** Serial field does not contain '{}'\n".format(fieldcheck["serial"])
 
         return msg
