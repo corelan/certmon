@@ -19,18 +19,8 @@
 
 import os
 import sys
-import ssl
-import socket
-from socket import gethostname
-import OpenSSL
 import datetime
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
 import traceback
-import time
-
-
 
 from mail.mail_list import MailList
 from mail.mailer import Mailer
@@ -83,15 +73,6 @@ _/ ___\/ __ \_  __ \   __\/     \ /  _ \ /    \\
   """ % siteurl)
 
     return
-
-
-def check_port(host, port):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        s.connect((host, port))
-        return True
-    except:
-        return False
 
 
 # ----- classes -----
