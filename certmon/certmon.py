@@ -59,24 +59,6 @@ def getNow():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
-def showSyntax(args):
-    print("")
-    print(" Usage: %s [arguments]" % args[0])
-    print("")
-    print(" Optional arguments:")
-    print("     -h                   : show help\n")
-    print("     -c <certconfigfile>  : full path to cert config file.")
-    print("                            Defaults to certmon.conf in current folder\n")
-    print("     -s <smtpconfigfile>  : full path to smtp config file.")
-    print("                            Defaults to certmon_smtp.conf in current folder\n")
-    print("     -w <nr>              : Warn of upcoming expiration x number of days in advance (default: 30)\n")
-    print("     -mail                : Test e-mail configuration\n")
-    print("     -v                   : Show verbose information about the certificates")
-    print("")
-    return
-
-
-
 def showBanner():
 
     print ("""
