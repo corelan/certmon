@@ -10,10 +10,7 @@ class MailConfig:
 
     def __init__(self, filename):
         self.filename = filename
-        self.fullpath = os.path.join(
-            os.path.dirname(
-                os.path.realpath(__file__)),
-            filename)
+        self.fullpath = filename
 
     def configFileExists(self):
         return os.path.isfile(self.fullpath)

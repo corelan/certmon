@@ -27,14 +27,14 @@ __doc__ = """certmon - Monitor TLS Certificates
 Usage:
     certmon.py [-v] [-c=<certconfigfile>] [-s=<smtpconfigfile>] [-w=<nr>]
     certmon.py (-h | --help)
-    certmon.py -mail
+    certmon.py --test-mail
 
 Options:
     -h --help               Show this help screen.
     -c=<certconfigfile>     Full path to cert config file [default: certmon.conf].
     -s=<smtpconfigfile>     Full path to smtp config file [default: certmon_smtp.conf].
     -w=<nr>                 Warn of upcoming expiration nr of days in advance [default: 30].
-    -mail                   Test e-mail configuration.
+    --test-mail             Test e-mail configuration.
     -v                      Show verbose information about the certificates.
 
 """
@@ -154,7 +154,7 @@ if __name__ == "__main__":
         print("[+] Using mail config file %s" % mailconfigfile)
         cEmailConfig.readConfigFile()
 
-    if arguments['-mail']:
+    if arguments['--test-mail']:
         print("[+] Test Mail Configuration")
         content = []
         mailhandler = Mailer(mailconfigfile)
