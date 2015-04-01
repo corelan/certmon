@@ -142,29 +142,20 @@ if __name__ == "__main__":
     # print(alertbefore)
     # print(showverbose)
 
-    sys.exit(0)
-
-    arguments = []
-    if len(sys.argv) >= 2:
-        arguments = sys.argv[1:]
-
     print("[+] Current date: %s" % getNow())
-    print(
-        "[+] Warn about upcoming expirations in less than %d days" %
-        alertbefore)
+    print("[+] Warn about upcoming expirations in less than %d days" % alertbefore)
 
     # check email config file
     cEmailConfig = MailConfig(mailconfigfile)
     if not cEmailConfig.configFileExists():
-        print(
-            "[-] Oops, email config file %s doesn't exist yet" %
-            mailconfigfile)
+        print("[-] Oops, email config file %s doesn't exist yet" % mailconfigfile)
         cEmailConfig.initConfigFile()
     else:
         print("[+] Using mail config file %s" % mailconfigfile)
         cEmailConfig.readConfigFile()
 
-    if "mail" in args:
+    if arguments['-mail']:
+        print("[+] Test Mail Configuration")
         content = []
         mailhandler = Mailer(mailconfigfile)
         info = ['certmon.py email test']
