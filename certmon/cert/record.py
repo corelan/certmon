@@ -17,6 +17,10 @@
 import socket
 from socket import gethostname
 from .cert import Cert
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class Record:
 

@@ -22,6 +22,10 @@ from email.mime.multipart import MIMEMultipart
 
 import socket
 from socket import gethostname
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 siteurl = "https://github.com/corelan/certmon"
 

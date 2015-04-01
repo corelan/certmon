@@ -17,6 +17,10 @@
 import ssl
 import OpenSSL
 import datetime
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class Cert:
     def __init__(self, ip=None, port=None, fieldcheck=None):

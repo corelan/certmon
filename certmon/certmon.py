@@ -147,7 +147,6 @@ if __name__ == "__main__":
         mailhandler.sendmail(info, content, 'Email test')
         sys.exit(0)
 
-    sys.exit(0)
     mailhandler = Mailer(mailconfigfile)
     warn_list = init_warn_mail_list(mailer=mailhandler)
     expired_list = init_expired_mail_list(mailer=mailhandler)

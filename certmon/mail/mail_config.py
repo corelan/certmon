@@ -15,6 +15,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class MailConfig:
 
