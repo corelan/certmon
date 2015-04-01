@@ -18,7 +18,7 @@ import os
 from .record import Record
 import logging
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 class CertmonConf:
 
@@ -34,8 +34,8 @@ class CertmonConf:
         if os.path.isfile(certconfig_filename):
             self.certconfigfile = open(certconfig_filename, "r")
         else:
-            logger.error("Oops, file {} does not exist".format(certconfig_filename))
-            logger.error("Desired format:    host:port   (one entry per line)")
+            log.error("Oops, file {} does not exist".format(certconfig_filename))
+            log.error("Desired format:    host:port   (one entry per line)")
 
     def close(self):
         self.certconfigfile.close()

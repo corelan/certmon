@@ -17,7 +17,7 @@
 import os
 import logging
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 class MailConfig:
 
@@ -75,11 +75,11 @@ class MailConfig:
         for l in filecontent:
             f.write(bytes("%s\n" % l, 'UTF-8'))
         f.close()
-        logger.info("Saved new config file.")
+        log.info("Saved new config file.")
         return
 
     def initConfigFile(self):
-        logger.info("Creating a new config file.")
+        log.info("Creating a new config file.")
         i_server = ""
         i_port = 25
         i_timeout = 300

@@ -48,8 +48,7 @@ from mail.mail_config import MailConfig
 from cert.record import Record
 from cert.certmon_conf import CertmonConf
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+log = logging.getLogger(__name__)
 curdate = datetime.datetime.now()
 siteurl = "https://github.com/corelan/certmon"
 

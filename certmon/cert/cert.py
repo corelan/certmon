@@ -19,7 +19,7 @@ import OpenSSL
 import datetime
 import logging
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 class Cert:
     def __init__(self, ip=None, port=None, fieldcheck=None):
@@ -74,7 +74,7 @@ class Cert:
     def is_expired(self):
         self.delta = self.expire_date - self._curr_date()
         if self.delta.days < 0:
-            logger.info("\t*** CERTIFICATE HAS EXPIRED ON %s (%d days ago) ***" %
+            log.info("\t*** CERTIFICATE HAS EXPIRED ON %s (%d days ago) ***" %
                   (self.expire_date, (self.delta.days * -1)))
             return True
         else:
@@ -83,15 +83,15 @@ class Cert:
     def is_alertbefore(self):
         self.delta = self.expire_date - self._curr_date()
         if self.delta.days == 0:
-            logger.info("*** CERTIFICATE EXPIRES TODAY ***")
+            log.info("*** CERTIFICATE EXPIRES TODAY ***")
             return True
         elif self.delta.days < self.alertbefore_date:
-            logger.info("** Warning: certificate will expire in less than %d days" % self.alertbefore_date)
+            log.info("** Warning: certificate will expire in less than %d days" % self.alertbefore_date)
             # NOTE return True xor False?!
             return True
         else:
-            logger.info("Cert expiration OK")
-            logger.info("Certificate will expire on %s (%d days from now)" % (self.expire_date, self.delta.days))
+            log.info("Cert expiration OK")
+            log.info("Certificate will expire on %s (%d days from now)" % (self.expire_date, self.delta.days))
             return False
 
     def is_changed(self):
@@ -118,20 +118,20 @@ class Cert:
         msg += "  Serial: {}\n".format(self.serial)
 
         if not self.subjectok:
-            logger.info("Subject field contains '%s'" % subject)
-            logger.info("Expected to contain: '%s'" % fieldcheck["subject"])
+            log.info("Subject field contains '%s'" % subject)
+            log.info("Expected to contain: '%s'" % fieldcheck["subject"])
             thismsg += "** Subject field does not contain '{}'\n".format(fieldcheck["subject"])
         if not self.issuerok:
-            logger.info("Issuer field contains '%s'" % issuer)
-            logger.info("Expected to contain: '%s'" %fieldcheck["issuer"])
+            log.info("Issuer field contains '%s'" % issuer)
+            log.info("Expected to contain: '%s'" %fieldcheck["issuer"])
             thismsg += "** Issuer field does not contain '{}'\n".format(fieldcheck["issuer"])
         if not self.versionok:
-            logger.info("Version field contains '%s'" % version)
-            logger.info("Expected to contain: '%s'" % fieldcheck["version"])
+            log.info("Version field contains '%s'" % version)
+            log.info("Expected to contain: '%s'" % fieldcheck["version"])
             thismsg += "** Version field does not contain '{}'\n".format(fieldcheck["version"])
         if not self.serialok:
-            logger.info("Serial field contains '%s'" % serial)
-            logger.info("Expected to contain: '%s'" % fieldcheck["serial"])
+            log.info("Serial field contains '%s'" % serial)
+            log.info("Expected to contain: '%s'" % fieldcheck["serial"])
             thismsg += "** Serial field does not contain '{}'\n".format(fieldcheck["serial"])
 
         return msg

@@ -24,7 +24,7 @@ import socket
 from socket import gethostname
 import logging
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 siteurl = "https://github.com/corelan/certmon"
 
@@ -58,7 +58,7 @@ class Mailer:
         cEmailConfig.readConfigFile()
         serverconfigs = cEmailConfig.serverinfo
         # connect to the first one that is listening
-        logger.info(
+        log.info(
             " Config file appears to contain %d mail server definitions" %
             len(serverconfigs))
         for mailid in serverconfigs:
@@ -67,12 +67,12 @@ class Mailer:
                 self.server = thisconfig["server"]
             if "port" in thisconfig:
                 self.port = int(thisconfig["port"])
-            logger.info(
+            log.info(
                 " Checking if %s:%d is reachable" %
                 (self.server, self.port))
             if check_port(self.server, self.port):
                 # fill out the rest and terminate the loop
-                logger.info("Yup, port is open")
+                log.info("Yup, port is open")
                 if "timeout" in thisconfig:
                     self.timeout = int(thisconfig["timeout"])
                 if "auth" in thisconfig:
@@ -95,7 +95,7 @@ class Mailer:
                     self.fromaddress = thisconfig["from"]
                 break
             else:
-                logger.info("    Nope")
+                log.info("    Nope")
         return
 
     def sendmail(self, info, logfile=[], mailsubject="Certmon Alert"):
@@ -124,7 +124,7 @@ class Mailer:
         thistimeout = 5
         while not noerror:
             try:
-                logger.info(
+                log.info(
                     "Connecting to %s on port %d" %
                     (self.server, self.port))
                 s = smtplib.SMTP(
@@ -132,52 +132,52 @@ class Mailer:
                     self.port,
                     'minicase',
                     self.timeout)
-                logger.info("Connected")
+                log.info("Connected")
                 if self.usetls:
-                    logger.info("Issuing STARTTLS")
+                    log.info("Issuing STARTTLS")
                     s.starttls()
-                    logger.info("STARTTLS established")
+                    log.info("STARTTLS established")
                 if self.requirelogin:
-                    logger.info("Authenticating")
+                    log.info("Authenticating")
                     s.login(self.login, self.password)
-                    logger.info("Authenticated")
-                logger.info("Sending email")
+                    log.info("Authenticated")
+                log.info("Sending email")
                 s.sendmail(self.to, [self.to], msg.as_string())
-                logger.info("Mail sent, disconnecting")
+                log.info("Mail sent, disconnecting")
                 s.quit()
                 noerror = True
             except smtplib.SMTPServerDisconnected as e:
-                logger.error("Server disconnected unexpectedly. This is probably okay")
+                log.error("Server disconnected unexpectedly. This is probably okay")
                 noerror = True
             except smtplib.SMTPResponseException as e:
-                logger.error(
+                log.error(
                     "Server returned %s : %s" %
                     (str(
                         e.smtp_code),
                         e.smtp_error))
             except smtplib.SMTPSenderRefused as e:
-                logger.error(
+                log.error(
                     "Sender refused %s : %s" %
                     (str(
                         e.smtp_code),
                         smtp_error))
             except smtplib.SMTPRecipientsRefused as e:
-                logger.error("Recipients refused", exc_info=True)
+                log.error("Recipients refused", exc_info=True)
             except smtplib.SMTPDataError as e:
-                logger.error("Server refused to accept the data", exc_info=True)
+                log.error("Server refused to accept the data", exc_info=True)
             except smtplib.SMTPConnectError as e:
-                logger.error("Error establishing connection to server", exc_info=True)
+                log.error("Error establishing connection to server", exc_info=True)
             except smtplib.SMTPHeloError as e:
-                logger.error("HELO Error", exc_info=True)
+                log.error("HELO Error", exc_info=True)
             except smtplib.SMTPAuthenticationError as e:
-                logger.error("Authentication", exc_info=True)
+                log.error("Authentication", exc_info=True)
             except smtplib.SMTPException as e:
-                logger.error("Sending email", exc_info=True)
+                log.error("Sending email", exc_info=True)
             except:
-                logger.error("Unable to send email !")
+                log.error("Unable to send email !")
 
             if not noerror:
-                logger.info("I'll try again in %d seconds" % thistimeout)
+                log.info("I'll try again in %d seconds" % thistimeout)
                 time.sleep(thistimeout)
                 if thistimeout < 1200:
                     thistimeout += 5

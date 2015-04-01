@@ -19,7 +19,7 @@ siteurl = "https://github.com/corelan/certmon"
 import datetime
 import logging
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 def getNow():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

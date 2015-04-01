@@ -19,7 +19,7 @@ from socket import gethostname
 from .cert import Cert
 import logging
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 class Record:
 
