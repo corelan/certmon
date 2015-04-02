@@ -22,11 +22,14 @@ import sys
 import datetime
 import traceback
 import logging
+import socks
+import socket
+import urllib.request
 
 __doc__ = """certmon - Monitor TLS Certificates
 
 Usage:
-    certmon.py [-v] [-c=<certconfigfile>] [-s=<smtpconfigfile>] [-w=<nr>]
+    certmon.py [-v] [--tor] [-c=<certconfigfile>] [-s=<smtpconfigfile>] [-w=<nr>]
     certmon.py (-h | --help)
     certmon.py --test-mail
 
@@ -37,6 +40,7 @@ Options:
     -w=<nr>                 Warn of upcoming expiration nr of days in advance [default: 30].
     --test-mail             Test e-mail configuration.
     -v                      Show verbose information about the certificates.
+    --tor                   Make certificate requests via default tor socks proxy localhost 9050.
 
 """
 from docopt import docopt
@@ -139,6 +143,12 @@ if __name__ == "__main__":
     expired_list = init_expired_mail_list(mailer=mailhandler)
     changed_list = init_changed_mail_list(mailer=mailhandler)
 
+    if arguments['--tor']:
+        original_socket = socket.socket
+        socks.set_default_proxy(socks.SOCKS5, "localhost", 9050)
+        socket.socket = socks.socksocket
+        log.info("socks public ip: " + str(urllib.request.urlopen('http://ip.42.pl/raw').read()))
+
     all_certs = []
     certmon_conf = CertmonConf(certconfigfile)
     for record in certmon_conf.records:
@@ -151,6 +161,10 @@ if __name__ == "__main__":
             warn_list.cert_msgs.append(cert.msg())
         if cert.is_changed():
             changed_list.cert_msgs.append(cert.msg())
+
+    if arguments['--tor']:
+        socket.socket = original_socket
+        log.info("public ip: " + str(urllib.request.urlopen('http://ip.42.pl/raw').read()))
 
     expired_list.send()
     warn_list.send()
