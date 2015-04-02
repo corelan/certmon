@@ -53,12 +53,6 @@ curdate = datetime.datetime.now()
 siteurl = "https://github.com/corelan/certmon"
 
 
-def check_python_version():
-    if sys.version_info < (3, 0, 0):
-        log.critical("You need python v3 or later to run this script\n")
-        exit(1)
-
-
 def getNow():
     return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -106,7 +100,6 @@ def init_expired_mail_list(mailer=None):
 
 if __name__ == "__main__":
 
-    check_python_version()
     arguments = docopt(__doc__, version='0.0.1')
 
     mailconfigerror = True
