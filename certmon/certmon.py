@@ -55,7 +55,7 @@ siteurl = "https://github.com/corelan/certmon"
 
 def check_python_version():
     if sys.version_info < (3, 0, 0):
-        logger.critical("You need python v3 or later to run this script\n")
+        log.critical("You need python v3 or later to run this script\n")
         exit(1)
 
 
@@ -113,23 +113,28 @@ if __name__ == "__main__":
     mailconfigfile = arguments['-s']
     certconfigfile = arguments['-c']
     alertbefore = int(arguments['-w'])
-    showverbose = arguments['-v']
+    verbose = arguments['-v']
+
+    if verbose:
+        logging.basicConfig(level=logging.INFO)
+    else:
+        logging.basicConfig()
 
     showBanner()
 
-    logger.info("Current date: %s", getNow())
-    logger.info("Warn about upcoming expirations in less than %d days", alertbefore)
+    log.info("Current date: %s", getNow())
+    log.info("Warn about upcoming expirations in less than %d days", alertbefore)
 
     cEmailConfig = MailConfig(mailconfigfile)
     if not cEmailConfig.configFileExists():
-        logger.warning("Oops, email config file %s doesn't exist yet", mailconfigfile)
+        log.warning("Oops, email config file %s doesn't exist yet", mailconfigfile)
         cEmailConfig.initConfigFile()
     else:
-        logger.info("Using mail config file %s", mailconfigfile)
+        log.info("Using mail config file %s", mailconfigfile)
         cEmailConfig.readConfigFile()
 
     if arguments['--test-mail']:
-        logger.info("Test Mail Configuration")
+        log.info("Test Mail Configuration")
         content = []
         mailhandler = Mailer(mailconfigfile)
         info = ['certmon.py email test']
