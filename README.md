@@ -167,4 +167,12 @@ If you want to check if the mail configuration works correctly simply run the sc
 You should get a test email in your mailbox.
 
 
+limitations / known issues
+--------------------------
+The script is not able to handle host headers or URI's.  It will simply connect to a server on a port, and dump the certificate.  
+
+
+License
+-------
+GPL
 
