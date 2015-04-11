@@ -23,10 +23,10 @@ log = logging.getLogger(__name__)
 
 class Record:
 
-    def __init__(self, rhost, rport, checkdata, fieldcheck):
+    def __init__(self, target_host, target_port, checkdata, fieldcheck):
         self.fields_to_check = {}
-        self.host = rhost
-        self.port = rport
+        self.host = target_host
+        self.port = target_port
         self.checkdata = checkdata
         self.fieldcheck = fieldcheck
         self.IPs = None
@@ -40,5 +40,5 @@ class Record:
     def fetch_certs(self):
         certs = []
         for ip in self.IPs:
-            certs.append(Cert(ip=ip, port=self.port, fieldcheck=self.fieldcheck))
+            certs.append(Cert(host=self.host, ip=ip, port=self.port, fieldcheck=self.fieldcheck))
         return certs

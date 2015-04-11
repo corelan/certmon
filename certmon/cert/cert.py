@@ -22,18 +22,19 @@ import logging
 log = logging.getLogger(__name__)
 
 class Cert:
-    def __init__(self, ip=None, port=None, fieldcheck=None):
+    def __init__(self, host=None, ip=None, port=None, fieldcheck=None):
         self.ip = ip
         self.port = port
+        self.host = host
         self.fieldcheck = fieldcheck
 
         self.x509 = None
         self.certinfo = None
 
-        self.target = None
-        self.target_port = None
-        self.target_host = None
-        self.target_ip = None
+        # self.target = None
+        # self.target_port = None
+        # self.target_host = None
+        # self.target_ip = None
 
         self.issuer = None
         self.serial = None
@@ -110,7 +111,7 @@ class Cert:
         else:
             extratxt = " (will expire in {} days)".format(diff)
 
-        msg += "Host: {}, Port: {}, IP: {}\n".format(self.target_host, self.target_port, self.target_ip)
+        msg += "Host: {}, Port: {}, IP: {}\n".format(self.host, self.port, self.ip)
         msg += "  Subject: {}\n".format(self.subject)
         msg += "  Expiration date: {}{}\n".format(self.expire_date, extratxt)
         msg += "  Issuer: {}\n".format(self.issuer)
