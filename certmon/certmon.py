@@ -115,7 +115,7 @@ if __name__ == "__main__":
     if verbose:
         logging.basicConfig(level=logging.INFO)
     else:
-        logging.basicConfig()
+        logging.basicConfig(format="[+] %(message)s",level=logging.INFO)
 
     showBanner()
 
@@ -166,7 +166,7 @@ if __name__ == "__main__":
         socket.socket = original_socket
         log.info("public ip: " + str(urllib.request.urlopen('http://ip.42.pl/raw').read()))
 
-    expired_list.send()
-    warn_list.send()
-    changed_list.send()
+    # expired_list.send()
+    # warn_list.send()
+    # changed_list.send()
 

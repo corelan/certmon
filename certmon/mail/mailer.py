@@ -59,7 +59,7 @@ class Mailer:
         serverconfigs = cEmailConfig.serverinfo
         # connect to the first one that is listening
         log.info(
-            " Config file appears to contain %d mail server definitions" %
+            "Config file appears to contain %d mail server definitions" %
             len(serverconfigs))
         for mailid in serverconfigs:
             thisconfig = serverconfigs[mailid]
@@ -68,7 +68,7 @@ class Mailer:
             if "port" in thisconfig:
                 self.port = int(thisconfig["port"])
             log.info(
-                " Checking if %s:%d is reachable" %
+                "Checking if %s:%d is reachable" %
                 (self.server, self.port))
             if check_port(self.server, self.port):
                 # fill out the rest and terminate the loop
