@@ -104,6 +104,8 @@ def init_expired_mail_list(mailer=None):
 
 if __name__ == "__main__":
 
+    showBanner()
+
     arguments = docopt(__doc__, version='0.0.1')
 
     mailconfigerror = True
@@ -117,7 +119,6 @@ if __name__ == "__main__":
     else:
         logging.basicConfig(format="[+] %(message)s",level=logging.INFO)
 
-    showBanner()
 
     log.info("Current date: %s", getNow())
     log.info("Warn about upcoming expirations in less than %d days", alertbefore)

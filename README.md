@@ -115,23 +115,21 @@ _/ ___\/ __ \_  __ \   __\/     \ /  _ \ /    \
               corelanc0d3r - www.corelan.be
               https://github.com/corelan/certmon
 
+certmon - Monitor TLS Certificates
 
- Usage: certmon.py [arguments]
+Usage:
+    certmon.py [-v] [--tor] [-c=<certconfigfile>] [-s=<smtpconfigfile>] [-w=<nr>]
+    certmon.py (-h | --help)
+    certmon.py --test-mail
 
- Optional arguments:
-     -h                   : show help
-
-     -c <certconfigfile>  : full path to cert config file.
-                            Defaults to certmon.conf in current folder
-
-     -s <smtpconfigfile>  : full path to smtp config file.
-                            Defaults to certmon_smtp.conf in current folder
-
-     -w <nr>              : Warn of upcoming expiration x number of days in advance (default: 30)
-
-     -mail                : Test e-mail configuration
-
-     -v                   : Show verbose information about the certificates
+Options:
+    -h --help               Show this help screen.
+    -c=<certconfigfile>     Full path to cert config file [default: certmon.conf].
+    -s=<smtpconfigfile>     Full path to smtp config file [default: certmon_smtp.conf].
+    -w=<nr>                 Warn of upcoming expiration nr of days in advance [default: 30].
+    --test-mail             Test e-mail configuration.
+    -v                      Show verbose information about the certificates.
+    --tor                   Make certificate requests via default tor socks proxy localhost 9050.
 ```
 
 
