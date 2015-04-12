@@ -124,6 +124,7 @@ class Mailer:
         thistimeout = 5
         while not noerror:
             try:
+                log.info("")
                 log.info(
                     "Connecting to %s on port %d" %
                     (self.server, self.port))

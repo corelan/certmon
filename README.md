@@ -25,7 +25,7 @@ Perform a default install 'for all users', install in the default installation f
 
 Next, open an Administrator command prompt and run the following commands to install the missing libraries:
 
-PyOpenSSL:
+**PyOpenSSL:**
 
 ```
 c:
@@ -66,7 +66,7 @@ Installing collected packages: pycparser, cffi, pyasn1, six, cryptography, pyOpe
 Successfully installed cffi-0.9.2 cryptography-0.8 pyOpenSSL-0.14 pyasn1-0.1.7 pycparser-2.10 six-1.9.0
 ```
 
-PySocks:
+**PySocks:**
 
 ```
 pip install PySocks
@@ -80,7 +80,7 @@ Installing collected packages: PySocks
 Successfully installed PySocks-1.5.3
 ```
 
-docopt:
+**docopt:**
 
 ```
 pip install docopt
