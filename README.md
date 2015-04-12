@@ -16,12 +16,16 @@ This script requires Python v3 and has been written/tested on Windows 7.
 Installation instructions (Windows 7)
 -------------------------------------
 
-This script requires Python v3 and the pyOpenSSL library.   It has been developed and tested using Python v3.4.3, on Windows 7 SP1, 64bit.
+This script requires Python v3 and some libraries. It has been developed and tested using Python v3.4.3, on Windows 7 SP1, 64bit.
+Most of the required libraries are installed by default,  but others require manual installation.
+(pyOpenSSL, docopt, PySocks) 
 
 Download Python3 from https://www.python.org/downloads and launch the installation package with Administrator privileges.
 Perform a default install 'for all users', install in the default installation folder.
 
-Next, open an Administrator command prompt and run the following commands to install pyOpenSSL:
+Next, open an Administrator command prompt and run the following commands to install the missing libraries:
+
+PyOpenSSL:
 
 ```
 c:
@@ -62,8 +66,38 @@ Installing collected packages: pycparser, cffi, pyasn1, six, cryptography, pyOpe
 Successfully installed cffi-0.9.2 cryptography-0.8 pyOpenSSL-0.14 pyasn1-0.1.7 pycparser-2.10 six-1.9.0
 ```
 
+PySocks:
 
-Finally, download certmon.py and put it in a folder somewhere (e.g. c:\certmon)
+```
+pip install PySocks
+```
+Output:
+```
+Collecting PySocks
+  Downloading PySocks-1.5.3.tar.gz
+Installing collected packages: PySocks
+  Running setup.py install for PySocks
+Successfully installed PySocks-1.5.3
+```
+
+docopt:
+
+```
+pip install docopt
+```
+Output
+```
+Collecting docopt
+  Downloading docopt-0.6.2.tar.gz
+Installing collected packages: docopt
+  Running setup.py install for docopt
+Successfully installed docopt-0.6.2
+```
+
+
+Finally, download the certmon script zip file: https://github.com/corelan/certmon/archive/master.zip and extract it to a folder (e.g. c:\certmon)
+(or simply clone the repository via git to a local folder)
+
 
 Syntax
 ------
