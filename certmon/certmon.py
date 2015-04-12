@@ -155,10 +155,13 @@ if __name__ == "__main__":
     for record in certmon_conf.records:
         all_certs += record.fetch_certs()
 
-    log.info("-" * 75)
+    
     for cert in all_certs:
         log.info("")
+        log.info("-" * 75)
         log.info("Checking cert on %s (%s), port %s" % (cert.host, cert.ip, cert.port))
+        if verbose:
+            log.info(cert._dump_fields())
         if cert.is_expired():
             expired_list.cert_msgs.append(cert.msg())
         if cert.is_alertbefore():

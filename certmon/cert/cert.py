@@ -112,11 +112,7 @@ class Cert:
             extratxt = " (will expire in {} days)".format(diff)
 
         msg += "Host: {}, Port: {}, IP: {}\n".format(self.host, self.port, self.ip)
-        msg += "  Subject: {}\n".format(self.subject)
-        msg += "  Expiration date: {}{}\n".format(self.expire_date, extratxt)
-        msg += "  Issuer: {}\n".format(self.issuer)
-        msg += "  Version: {}\n".format(self.version)
-        msg += "  Serial: {}\n".format(self.serial)
+        msg += self._dump_fields(extratxt)     
 
         if not self.subjectok:
             log.info("Subject field contains '%s'" % subject)
@@ -136,6 +132,16 @@ class Cert:
             thismsg += "** Serial field does not contain '{}'\n".format(fieldcheck["serial"])
 
         return msg
+
+    def _dump_fields(self, extratxt=""):
+        msg = ""
+        msg += "  Subject: {}\n".format(self.subject)
+        msg += "  Expiration date: {}{}\n".format(self.expire_date, extratxt)
+        msg += "  Issuer: {}\n".format(self.issuer)
+        msg += "  Version: {}\n".format(self.version)
+        msg += "  Serial: {}\n".format(self.serial)
+        return msg
+
 
     def _check_fields(self):
         for fieldname in self.fieldcheck:
