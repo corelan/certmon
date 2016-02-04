@@ -48,14 +48,12 @@ class Cert:
         self.certchanged = False
 
         self.expire_date = None
-        self.alertbefore_date = 30
         self.delta = None
 
         if ip != None and port != None:
             self.fetch()
             self.parse()
 
- 
     def fetch(self):
         self.certinfo = ssl.get_server_certificate((self.ip, self.port))
 
@@ -81,13 +79,13 @@ class Cert:
         else:
             return False
 
-    def is_alertbefore(self):
+    def is_alertbefore(self, alertbefore):
         self.delta = self.expire_date - self._curr_date()
         if self.delta.days == 0:
             log.info("*** CERTIFICATE EXPIRES TODAY ***")
             return True
-        elif self.delta.days < self.alertbefore_date:
-            log.info("** Warning: certificate will expire in less than %d days" % self.alertbefore_date)
+        elif self.delta.days < alertbefore:
+            log.info("** Warning: certificate will expire in less than %d days" % alertbefore)
             # NOTE return True xor False?!
             return True
         else:
