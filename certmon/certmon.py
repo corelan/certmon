@@ -164,7 +164,7 @@ if __name__ == "__main__":
             log.info(cert._dump_fields())
         if cert.is_expired():
             expired_list.cert_msgs.append(cert.msg())
-        if cert.is_alertbefore():
+        if cert.is_alertbefore(alertbefore):
             warn_list.cert_msgs.append(cert.msg())
         if cert.is_changed():
             changed_list.cert_msgs.append(cert.msg())
