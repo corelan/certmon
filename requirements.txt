@@ -3,6 +3,6 @@ cryptography==0.8.1
 docopt==0.6.2
 pyasn1==0.1.7
 pycparser==2.10
-pyOpenSSL==0.14
+pyopenssl ~> 17.5.0
 PySocks==1.5.3
 six==1.9.0
